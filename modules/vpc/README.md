@@ -1,53 +1,45 @@
-# 🛠️ VPC Terraform Module
+# 🌐 VPC Networking Module
 
-هذا الموديول يقوم بإنشاء شبكة VPC متكاملة على AWS باستخدام Terraform. يشمل الآتي:
+This Terraform module provisions a basic VPC networking setup on AWS including:
 
-- VPC
-- Subnets (Public & Private)
-- Internet Gateway
-- Route Tables & Associations
+- A custom VPC  
+- Two public subnets  
+- Two private subnets  
+- An Internet Gateway  
+- Route table and associations  
 
----
-
-## 📦 الموارد التي يتم إنشاؤها:
-
-- `aws_vpc`
-- `aws_subnet` (2 Public + 2 Private)
-- `aws_internet_gateway`
-- `aws_route_table` + `aws_route_table_association`
 
 ---
 
-## 🔧 المتغيرات (Variables)
+## 📄 File Descriptions
 
-| اسم المتغير                  | النوع     | الوصف                            |
-|------------------------------|-----------|----------------------------------|
-| `myvpc_cidr_block`           | `string`  | CIDR block لـ VPC                |
-| `subnet1_cidr_block`         | `string`  | CIDR block لـ Public Subnet 1    |
-| `subnet2_cidr_block`         | `string`  | CIDR block لـ Public Subnet 2    |
-| `private_subnet1_cidr_block` | `string`  | CIDR block لـ Private Subnet 1   |
-| `private_subnet2_cidr_block` | `string`  | CIDR block لـ Private Subnet 2   |
+- **`main.tf`**  
+  Creates all the networking infrastructure:
+  - A VPC using a custom CIDR block  
+  - Two public subnets in separate availability zones  
+  - Two private subnets in separate availability zones  
+  - An Internet Gateway attached to the VPC  
+  - A route table for public subnets with a default route to the Internet Gateway  
+  - Associations between the route table and public subnets  
+
+- **`variables.tf`**  
+  Declares input variables required to customize the module:
+  - `myvpc_cidr_block` – The CIDR block for the VPC  
+  - `subnet1_cidr_block` – CIDR for public subnet in AZ1  
+  - `subnet2_cidr_block` – CIDR for public subnet in AZ2  
+  - `private_subnet1_cidr_block` – CIDR for private subnet in AZ1  
+  - `private_subnet2_cidr_block` – CIDR for private subnet in AZ2  
+
+- **`outputs.tf`**  
+  Exposes useful networking outputs:
+  - `vpc_id` – The ID of the created VPC  
+  - `public_subnet_ids` – A list of public subnet IDs  
+  - `private_subnet_ids` – A list of private subnet IDs  
 
 ---
 
-## 📤 المخرجات (Outputs)
+## 📌 Notes
 
-| اسم المخرج            | الوصف                                    |
-|------------------------|-------------------------------------------|
-| `vpc_id`               | الـ ID الخاص بـ VPC                       |
-| `public_subnet_ids`    | قائمة بـ IDs الخاصة بـ Public Subnets     |
-| `private_subnet_ids`   | قائمة بـ IDs الخاصة بـ Private Subnets    |
-
----
-
-## 🧪 مثال للاستخدام (Usage)
-
-```hcl
-module "network" {
-  source                     = "./modules/network"
-  myvpc_cidr_block           = var.myvpc_cidr_block
-  subnet1_cidr_block         = var.subnet1_cidr_block
-  subnet2_cidr_block         = var.subnet2_cidr_block
-  private_subnet1_cidr_block = var.private_subnet1_cidr_block
-  private_subnet2_cidr_block = var.private_subnet2_cidr_block
-}
+- Public subnets are automatically assigned public IPs on launch.  
+- Private subnets are created for use with resources like databases or internal services.  
+- You may extend this module later to include NAT Gateway, NACLs, or VPN configuration.
